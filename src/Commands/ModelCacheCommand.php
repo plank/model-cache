@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Plank\ModelCache\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class ModelCacheCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'model-cache';
 
     public $description = 'My command';
 
