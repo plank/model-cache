@@ -76,9 +76,9 @@ interface ManagesCache
         Closure $callable,
         array $tags = []
     ): mixed;
-    
+
     /**
-     * Cache a value forever that will be invalidated whenever any model of this 
+     * Cache a value forever that will be invalidated whenever any model of this
      * type changes, and take into account a user's permissions
      */
     public static function rememberWithPermissionsForever(
@@ -89,7 +89,7 @@ interface ManagesCache
     ): mixed;
 
     /**
-     * Cache something forever that will be invalidated whenever 
+     * Cache something forever that will be invalidated whenever
      * this particular model changes
      */
     public function rememberOnSelfForever(

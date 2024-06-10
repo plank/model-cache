@@ -51,8 +51,6 @@ trait ModelCache
 
     /**
      * Compute a set of default tags to be used when caching the model
-     *
-     * @return array
      */
     public static function defaultTags(): array
     {

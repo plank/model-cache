@@ -12,5 +12,5 @@ it('remembers values on the model', function (string $driver) {
     expect($value)->toBe('test');
 })->with([
     'tagged cache' => 'redis',
-    'taggless cache' => 'file'
+    'taggless cache' => 'file',
 ]);
