@@ -10,7 +10,7 @@ interface ManagesCache
     public static function modelCacheDisabled(): bool;
 
     /**
-     * Cache a value that will be invalidated whenever any model of this type changes, 
+     * Cache a value that will be invalidated whenever any model of this type changes,
      * and take into account a user's permissions
      */
     public static function rememberWithPermissions(

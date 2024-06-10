@@ -80,7 +80,7 @@ trait Cached
         if (! static::cacheSupportsTags()) {
             return Cache::remember(static::withCacheKeyPrefix($key), $ttl, $callable);
         }
-        
+
         $tags = array_merge(
             static::defaultTags(),
             static::modelCacheTag(),
@@ -130,7 +130,7 @@ trait Cached
         $tag = str(static::class)
             ->replace('\\', '_')
             ->snake();
-        
+
         return static::withCacheTagPrefix($tag);
     }
 
@@ -176,10 +176,8 @@ trait Cached
             ->append('_');
     }
 
-     /**
+    /**
      * Determine if the configured cache driver supports tagging.
-     *
-     * @return bool
      */
     protected static function cacheSupportsTags(): bool
     {
