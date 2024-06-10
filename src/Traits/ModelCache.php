@@ -36,7 +36,7 @@ trait Cached
         ?Permissable $user,
         Closure $callable,
         array $tags = [],
-        int $ttl = 3600
+        ?int $ttl = null
     ) {
         $permissionsKey = $user instanceof Permissable ? $user->permissionsKey() : 'guest';
 
@@ -47,12 +47,26 @@ trait Cached
         string $key,
         Closure $callable,
         array $tags = [],
-        int $ttl = 3600
+        ?int $ttl = null
     ) {
-        return static::remember($key.'-'.$this->getKey(), $callable, [
+        $ttl = $ttl ?? config()->get('model-cache.ttl', 3600);
+
+        if (static::modelCacheDisabled()) {
+            return $callable();
+        }
+
+        if (! static::cacheSupportsTags()) {
+            return Cache::remember(static::withCacheKeyPrefix($key), $ttl, $callable);
+        }
+
+        $tags = array_merge(
+            static::defaultTags(),
             $this->instanceCacheTag(),
-            ...$tags,
-        ], $ttl);
+            array_map([static::class, 'handleTag'], $tags),
+        );
+
+        return Cache::tags($tags)
+            ->remember(static::withCacheKeyPrefix($key), $ttl, $callable);
     }
 
     public static function rememberWithPermissions(
@@ -60,7 +74,7 @@ trait Cached
         ?Permissable $user,
         Closure $callable,
         array $tags = [],
-        int $ttl = 3600
+        ?int $ttl = null
     ): mixed {
         $permissionsKey = $user instanceof Permissable ? $user->permissionsKey() : 'guest';
 
@@ -71,8 +85,10 @@ trait Cached
         string $key,
         Closure $callable,
         array $tags = [],
-        int $ttl = 3600
+        ?int $ttl = null
     ): mixed {
+        $ttl = $ttl ?? config()->get('model-cache.ttl', 3600);
+
         if (static::modelCacheDisabled()) {
             return $callable();
         }
@@ -89,6 +105,74 @@ trait Cached
 
         return Cache::tags($tags)
             ->remember(static::withCacheKeyPrefix($key), $ttl, $callable);
+    }
+
+    public function rememberOnSelfWithPermissionsForever(
+        string $key,
+        ?Permissable $user,
+        Closure $callable,
+        array $tags = [],
+    ) {
+        $permissionsKey = $user instanceof Permissable ? $user->permissionsKey() : 'guest';
+
+        return $this->rememberOnSelfForever($key.'-'.$permissionsKey, $callable, $tags);
+    }
+
+    public function rememberOnSelfForever(
+        string $key,
+        Closure $callable,
+        array $tags = [],
+    ) {
+        if (static::modelCacheDisabled()) {
+            return $callable();
+        }
+
+        if (! static::cacheSupportsTags()) {
+            return Cache::rememberForever(static::withCacheKeyPrefix($key), $callable);
+        }
+
+        $tags = array_merge(
+            static::defaultTags(),
+            $this->instanceCacheTag(),
+            array_map([static::class, 'handleTag'], $tags),
+        );
+
+        return Cache::tags($tags)
+            ->rememberForever(static::withCacheKeyPrefix($key), $callable);
+    }
+
+    public static function rememberWithPermissionsForever(
+        string $key,
+        ?Permissable $user,
+        Closure $callable,
+        array $tags = [],
+    ): mixed {
+        $permissionsKey = $user instanceof Permissable ? $user->permissionsKey() : 'guest';
+
+        return static::rememberForever($key.'-'.$permissionsKey, $callable, $tags);
+    }
+
+    public static function rememberForever(
+        string $key,
+        Closure $callable,
+        array $tags = [],
+    ): mixed {
+        if (static::modelCacheDisabled()) {
+            return $callable();
+        }
+
+        if (! static::cacheSupportsTags()) {
+            return Cache::rememberForever(static::withCacheKeyPrefix($key), $callable);
+        }
+
+        $tags = array_merge(
+            static::defaultTags(),
+            static::modelCacheTag(),
+            array_map([static::class, 'handleTag'], $tags),
+        );
+
+        return Cache::tags($tags)
+            ->rememberForever(static::withCacheKeyPrefix($key), $callable);
     }
 
     /**

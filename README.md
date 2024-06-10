@@ -12,7 +12,6 @@
 
 :warning: Package is under active development. Wait for v1.0.0 for production use. :warning:
 
-
 ## Table of Contents
 
 - [Installation](#installation)
@@ -36,10 +35,10 @@
 
 ## Configuration
 
-The package's configuration file is located at `config/publisher.php`. If you did not publish the config file during installation, you can publish the configuration file using the following command:
+The package's configuration file is located at `config/model-cache.php`. If you did not publish the config file during installation, you can publish the configuration file using the following command:
 
 ```bash
-php artisan vendor:publish --provider="Plank\Publisher\PublisherServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Plank\ModelCache\ModelCacheServiceProvider" --tag="config"
 ```
 
 &nbsp;

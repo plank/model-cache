@@ -18,7 +18,18 @@ interface ManagesCache
         ?Permissable $user,
         callable $callable,
         array $tags = [],
-        int $ttl = 3600
+        ?int $ttl = null,
+    ): mixed;
+
+    /**
+     * Cache a value forever that will be invalidated whenever any model of this 
+     * type changes, and take into account a user's permissions
+     */
+    public static function rememberWithPermissionsForever(
+        string $key,
+        ?Permissable $user,
+        callable $callable,
+        array $tags = []
     ): mixed;
 
     /**
@@ -28,11 +39,49 @@ interface ManagesCache
         string $key,
         callable $callable,
         array $tags = [],
-        int $ttl = 3600,
+        ?int $ttl = null,
     ): mixed;
 
     /**
-     * Cache something that will be invalidated whenever this particular model changes
+     * Cache something forever that will be invalidated whenever
+     * any model of this type changes
+     */
+    public static function rememberForever(
+        string $key,
+        callable $callable,
+        array $tags = [],
+    ): mixed;
+
+    /**
+     * Cache something that will be invalidated whenever this particular
+     * model changes and take into account a user's permissions
+     *
+     * @return mixed
+     */
+    public function rememberOnSelfWithPermissions(
+        string $key,
+        ?Permissable $user,
+        callable $callable,
+        array $tags = [],
+        ?int $ttl = null,
+    );
+
+    /**
+     * Cache something that will be invalidated whenever this particular
+     * model changes and take into account a user's permissions
+     *
+     * @return mixed
+     */
+    public function rememberOnSelfWithPermissionsForever(
+        string $key,
+        ?Permissable $user,
+        callable $callable,
+        array $tags = []
+    );
+
+    /**
+     * Cache something that will be invalidated whenever this
+     * particular model changes
      *
      * @return mixed
      */
@@ -40,7 +89,19 @@ interface ManagesCache
         string $key,
         callable $callable,
         array $tags = [],
-        int $ttl = 3600
+        ?int $ttl = null,
+    );
+
+    /**
+     * Cache something forever that will be invalidated whenever 
+     * this particular model changes
+     *
+     * @return mixed
+     */
+    public function rememberOnSelfForever(
+        string $key,
+        callable $callable,
+        array $tags = [],
     );
 
     /**
