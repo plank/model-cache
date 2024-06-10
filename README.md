@@ -64,7 +64,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability within siren, please send an e-mail to [security@plank.co](mailto:security@plank.co). All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within the package, please send an e-mail to [security@plank.co](mailto:security@plank.co). All security vulnerabilities will be promptly addressed.
 
 &nbsp;
 
