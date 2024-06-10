@@ -210,7 +210,7 @@ trait ModelCache
                 return $tag::modelCacheTag();
             }
 
-            return str($tag)->snake();
+            $tag = str($tag)->snake();
         }
 
         return static::withCacheTagPrefix($tag);
