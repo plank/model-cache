@@ -13,8 +13,13 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Plank\\ModelCache\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Plank\\ModelCache\\Tests\\Helper\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
+
+        $this->artisan('migrate', [
+            '--path' => realpath(__DIR__).'/Database/Migrations',
+            '--realpath' => true,
+        ])->run();
     }
 
     protected function getPackageProviders($app)
@@ -22,15 +27,5 @@ class TestCase extends Orchestra
         return [
             ModelCacheServiceProvider::class,
         ];
-    }
-
-    public function getEnvironmentSetUp($app)
-    {
-        config()->set('database.default', 'testing');
-
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_model-cache_table.php.stub';
-        $migration->up();
-        */
     }
 }

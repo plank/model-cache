@@ -2,6 +2,8 @@
 
 namespace Plank\ModelCache\Contracts;
 
+use Closure;
+
 interface ManagesCache
 {
     /**
@@ -10,26 +12,48 @@ interface ManagesCache
     public static function modelCacheDisabled(): bool;
 
     /**
+     * Determine if the model should skipping flushing the cache
+     */
+    public function shouldSkipFlushing(): bool;
+
+    /**
+     * Flush the all cached items tagged with the models cache key
+     */
+    public function flushModelCache(): void;
+
+    /**
+     * Cache something that will be invalidated whenever this particular
+     * model changes and take into account a user's permissions
+     */
+    public function rememberOnSelfWithPermissions(
+        string $key,
+        ?Permissable $user,
+        Closure $callable,
+        array $tags = [],
+        ?int $ttl = null,
+    ): mixed;
+
+    /**
      * Cache a value that will be invalidated whenever any model of this type changes,
      * and take into account a user's permissions
      */
     public static function rememberWithPermissions(
         string $key,
         ?Permissable $user,
-        callable $callable,
+        Closure $callable,
         array $tags = [],
         ?int $ttl = null,
     ): mixed;
 
     /**
      * Cache a value forever that will be invalidated whenever any model of this
-     * type changes, and take into account a user's permissions
+     * type changes, and take into account a user's permissions f0ff1d3 (Basic test passing and redis added to github actions)
      */
-    public static function rememberWithPermissionsForever(
+    public function rememberOnSelf(
         string $key,
-        ?Permissable $user,
-        callable $callable,
-        array $tags = []
+        Closure $callable,
+        array $tags = [],
+        ?int $ttl = null,
     ): mixed;
 
     /**
@@ -37,9 +61,41 @@ interface ManagesCache
      */
     public static function remember(
         string $key,
-        callable $callable,
+        Closure $callable,
         array $tags = [],
         ?int $ttl = null,
+    ): mixed;
+
+    /**
+     * Cache something that will be invalidated whenever this particular
+     * model changes and take into account a user's permissions
+     */
+    public function rememberOnSelfWithPermissionsForever(
+        string $key,
+        ?Permissable $user,
+        Closure $callable,
+        array $tags = []
+    ): mixed;
+    
+    /**
+     * Cache a value forever that will be invalidated whenever any model of this 
+     * type changes, and take into account a user's permissions
+     */
+    public static function rememberWithPermissionsForever(
+        string $key,
+        ?Permissable $user,
+        Closure $callable,
+        array $tags = []
+    ): mixed;
+
+    /**
+     * Cache something forever that will be invalidated whenever 
+     * this particular model changes
+     */
+    public function rememberOnSelfForever(
+        string $key,
+        Closure $callable,
+        array $tags = [],
     ): mixed;
 
     /**
@@ -48,74 +104,7 @@ interface ManagesCache
      */
     public static function rememberForever(
         string $key,
-        callable $callable,
+        Closure $callable,
         array $tags = [],
     ): mixed;
-
-    /**
-     * Cache something that will be invalidated whenever this particular
-     * model changes and take into account a user's permissions
-     *
-     * @return mixed
-     */
-    public function rememberOnSelfWithPermissions(
-        string $key,
-        ?Permissable $user,
-        callable $callable,
-        array $tags = [],
-        ?int $ttl = null,
-    );
-
-    /**
-     * Cache something that will be invalidated whenever this particular
-     * model changes and take into account a user's permissions
-     *
-     * @return mixed
-     */
-    public function rememberOnSelfWithPermissionsForever(
-        string $key,
-        ?Permissable $user,
-        callable $callable,
-        array $tags = []
-    );
-
-    /**
-     * Cache something that will be invalidated whenever this
-     * particular model changes
-     *
-     * @return mixed
-     */
-    public function rememberOnSelf(
-        string $key,
-        callable $callable,
-        array $tags = [],
-        ?int $ttl = null,
-    );
-
-    /**
-     * Cache something forever that will be invalidated whenever
-     * this particular model changes
-     *
-     * @return mixed
-     */
-    public function rememberOnSelfForever(
-        string $key,
-        callable $callable,
-        array $tags = [],
-    );
-
-    /**
-     * Flush the all cached items tagged with the models cache key
-     */
-    public function flushModelCache();
-
-    /**
-     * Get the cache key for the model
-     */
-    public static function modelCacheTag(): string;
-
-    /**
-     * Get the cache key for the model
-     */
-    public function instanceCacheTag(): string;
 }
