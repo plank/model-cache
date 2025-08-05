@@ -1,6 +1,8 @@
 <?php
 
+use Plank\ModelCache\Enums\ExpireAfter;
+
 return [
     'enabled' => env('MODEL_CACHE_ENABLED', true),
-    'ttl' => env('MODEL_CACHE_TTL', 3600),
+    'ttl' => env('MODEL_CACHE_TTL', ExpireAfter::Forever),
 ];

@@ -3,21 +3,21 @@
 namespace Plank\ModelCache\Observers;
 
 use Illuminate\Database\Eloquent\Model;
-use Plank\ModelCache\Contracts\ManagesCache;
+use Plank\ModelCache\Contracts\Cachable;
 
 class ModelCacheObserver
 {
-    public function saved(Model&ManagesCache $model)
+    public function saved(Model&Cachable $model)
     {
         $model->flushModelCache();
     }
 
-    public function deleted(Model&ManagesCache $model)
+    public function deleted(Model&Cachable $model)
     {
         $model->flushModelCache();
     }
 
-    public function restored(Model&ManagesCache $model)
+    public function restored(Model&Cachable $model)
     {
         $model->flushModelCache();
     }

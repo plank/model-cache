@@ -10,13 +10,14 @@
 
 # Laravel Model Cache
 
-:warning: Package is under active development. Wait for v1.0.0 for production use. :warning:
+⚠️ Package is under active development. Do not use in production. ⚠️
 
 ## Table of Contents
 
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Contributing](#contributing)
+- [Usage](#usage)
 - [Credits](#credits)
 - [License](#license)
 - [Security Vulnerabilities](#security-vulnerabilities)
@@ -30,22 +31,6 @@
     ```bash
     composer require plank/model-cache
     ```
-
-&nbsp;
-
-## Configuration
-
-The package's configuration file is located at `config/model-cache.php`. If you did not publish the config file during installation, you can publish the configuration file using the following command:
-
-```bash
-php artisan vendor:publish --provider="Plank\ModelCache\ModelCacheServiceProvider" --tag="config"
-```
-
-&nbsp;
-
-## Contributing
-
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 &nbsp;
 
