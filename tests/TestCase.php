@@ -16,8 +16,10 @@ class TestCase extends Orchestra
             fn (string $modelName) => 'Plank\\ModelCache\\Tests\\Helper\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
 
+        config(['model-cache.enabled' => true]);
+
         $this->artisan('migrate', [
-            '--path' => realpath(__DIR__).'/Database/Migrations',
+            '--path' => __DIR__.'/Database/Migrations',
             '--realpath' => true,
         ])->run();
     }
