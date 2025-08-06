@@ -20,13 +20,13 @@ describe('ExpireAfter Enum', function () {
 
     it('returns default TTL from config', function () {
         config(['model-cache.ttl' => ExpireAfter::OneHour]);
-        
+
         expect(ExpireAfter::default())->toBe(ExpireAfter::OneHour);
     });
 
     it('handles Forever as default TTL', function () {
         config(['model-cache.ttl' => ExpireAfter::Forever]);
-        
+
         expect(ExpireAfter::default())->toBe(ExpireAfter::Forever);
         expect(ExpireAfter::default()->inSeconds())->toBeNull();
     });

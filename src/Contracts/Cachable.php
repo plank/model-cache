@@ -2,7 +2,6 @@
 
 namespace Plank\ModelCache\Contracts;
 
-use Closure;
 use Plank\ModelCache\Enums\ExpireAfter;
 
 interface Cachable extends Flushable
@@ -12,9 +11,9 @@ interface Cachable extends Flushable
      * type changes.
      *
      * @template TReturn
-     * 
-     * @param callable():TReturn|class-string $callable
-     * @param callable():string|class-string|string $prefix
+     *
+     * @param  callable():TReturn|class-string  $callable
+     * @param  callable():string|class-string|string  $prefix
      * @return TReturn
      */
     public static function remember(
@@ -30,9 +29,9 @@ interface Cachable extends Flushable
      * be invalidated when other instances of this Model change.
      *
      * @template TReturn
-     * 
-     * @param callable():TReturn|class-string $callable
-     * @param callable():string|string|class-string $prefix
+     *
+     * @param  callable():TReturn|class-string  $callable
+     * @param  callable():string|string|class-string  $prefix
      * @return TReturn
      */
     public function rememberOnSelf(

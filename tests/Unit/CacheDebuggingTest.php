@@ -23,14 +23,14 @@ describe('Cache Debugging', function () {
         $closure = function () {
             return 'test';
         };
-        
+
         // Use reflection to access protected method
         $reflection = new \ReflectionClass(User::class);
         $method = $reflection->getMethod('cachableKey');
         $method->setAccessible(true);
-        
+
         $key = $method->invokeArgs(null, [$closure]);
-        
+
         expect($key)->toBeString();
         expect(strlen($key))->toBeGreaterThan(0);
         expect($key)->toContain('CacheDebuggingTest::{closure}');
@@ -38,24 +38,26 @@ describe('Cache Debugging', function () {
 
     it('checks cache store type', function () {
         $store = Cache::getStore();
-        
+
         expect($store)->toBeInstanceOf(\Illuminate\Cache\ArrayStore::class);
         expect(method_exists($store, 'tags'))->toBeTrue();
     });
 
     it('manually tests cache remember', function () {
         $callCount = 0;
-        
+
         $result1 = Cache::remember('manual_test', 60, function () use (&$callCount) {
             $callCount++;
+
             return 'manual_cached';
         });
-        
+
         $result2 = Cache::remember('manual_test', 60, function () use (&$callCount) {
             $callCount++;
+
             return 'manual_cached';
         });
-        
+
         expect($result1)->toBe('manual_cached');
         expect($result2)->toBe('manual_cached');
         expect($callCount)->toBe(1);

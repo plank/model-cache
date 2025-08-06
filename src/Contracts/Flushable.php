@@ -20,7 +20,7 @@ interface Flushable
     public static function modelCacheTag(): string;
 
     /**
-     * Get the string that represents the tag for this model instance 
+     * Get the string that represents the tag for this model instance
      */
     public function instanceCacheTag(): string;
 

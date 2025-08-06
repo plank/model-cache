@@ -20,9 +20,9 @@ trait IsCachable
 
     /**
      * @template TReturn
-     * 
-     * @param callable():TReturn|class-string $callable
-     * @param callable():string|class-string|string $prefix
+     *
+     * @param  callable():TReturn|class-string  $callable
+     * @param  callable():string|class-string|string  $prefix
      * @return TReturn
      */
     public static function remember(
@@ -40,16 +40,16 @@ trait IsCachable
 
         $prefix = match (true) {
             is_callable($prefix) => $prefix(),
-            is_string($prefix) && class_exists($prefix) && is_callable(new $prefix()) => (new $prefix())(),
+            is_string($prefix) && class_exists($prefix) && is_callable(new $prefix) => (new $prefix)(),
             default => $prefix,
         };
 
         $key = $prefix
-            ? ($prefix . ':' . $key)
+            ? ($prefix.':'.$key)
             : $key;
 
         $key = ($prefix = static::modelCachePrefix())
-            ? ($prefix . ':' . $key)
+            ? ($prefix.':'.$key)
             : $key;
 
         $ttl = $ttl instanceof ExpireAfter
@@ -72,9 +72,9 @@ trait IsCachable
 
     /**
      * @template TReturn
-     * 
-     * @param callable():TReturn|class-string $callable
-     * @param callable():string|string|class-string $prefix
+     *
+     * @param  callable():TReturn|class-string  $callable
+     * @param  callable():string|string|class-string  $prefix
      * @return TReturn
      */
     public function rememberOnSelf(
@@ -92,12 +92,12 @@ trait IsCachable
 
         $prefix = match (true) {
             is_callable($prefix) => $prefix(),
-            is_string($prefix) && class_exists($prefix) && is_callable(new $prefix()) => (new $prefix())(),
+            is_string($prefix) && class_exists($prefix) && is_callable(new $prefix) => (new $prefix)(),
             default => $prefix,
         };
 
         $key = $prefix
-            ? ($prefix . ':' . $key)
+            ? ($prefix.':'.$key)
             : $key;
 
         $ttl ??= ExpireAfter::default();
@@ -107,7 +107,7 @@ trait IsCachable
             : $ttl;
 
         if (! static::cacheSupportsTags()) {
-            return Cache::remember(static::modelCachePrefix() . ':' . $key, $ttl, $closure);
+            return Cache::remember(static::modelCachePrefix().':'.$key, $ttl, $closure);
         }
 
         $tags = array_merge(
@@ -117,7 +117,7 @@ trait IsCachable
         );
 
         return Cache::tags($tags)
-            ->remember(static::modelCachePrefix() . ':' . $key, $ttl, $closure);
+            ->remember(static::modelCachePrefix().':'.$key, $ttl, $closure);
     }
 
     protected static function handleTag(Flushable|string $tag)
@@ -131,7 +131,7 @@ trait IsCachable
         }
 
         return ($prefix = static::modelCachePrefix())
-            ? ($prefix . ':' . $tag)
+            ? ($prefix.':'.$tag)
             : $tag;
     }
 
@@ -156,10 +156,10 @@ trait IsCachable
 
         $isInvokeableClass = is_string($callable)
             && class_exists($callable)
-            && is_callable(new $callable());
+            && is_callable(new $callable);
 
         $callable = $isInvokeableClass
-            ? new $callable()
+            ? new $callable
             : $callable;
 
         return function () use ($callable) {
@@ -180,7 +180,7 @@ trait IsCachable
 
     private static function handleInvokableKey(string $class): string
     {
-        return $class . '::__invoke';
+        return $class.'::__invoke';
     }
 
     private static function handleCachableKey(Closure $closure): string
@@ -188,10 +188,10 @@ trait IsCachable
         $reflection = new ReflectionFunction($closure);
 
         if ($scopeClass = $reflection->getClosureScopeClass()) {
-            return $scopeClass->getName() . '::' . $reflection->getShortName() . ':' . $reflection->getStartLine();
+            return $scopeClass->getName().'::'.$reflection->getShortName().':'.$reflection->getStartLine();
         }
 
-        return 'global::' . $reflection->getShortName() . ':' . $reflection->getStartLine();
+        return 'global::'.$reflection->getShortName().':'.$reflection->getStartLine();
     }
 
     private static function handleArrayCallableKey(array $callable): string
@@ -199,14 +199,14 @@ trait IsCachable
         [$classOrObject, $method] = $callable;
 
         if (is_object($classOrObject)) {
-            return get_class($classOrObject) . '::' . $method . '_instance';
+            return get_class($classOrObject).'::'.$method.'_instance';
         }
 
-        return (string) ($classOrObject . '::' . $method . '_static');
+        return (string) ($classOrObject.'::'.$method.'_static');
     }
 
     private static function handleObjectCallableKey(object $callable): string
     {
-        return get_class($callable) . '::__invoke';
+        return get_class($callable).'::__invoke';
     }
 }

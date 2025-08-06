@@ -7,7 +7,7 @@ return [
     |--------------------------------------------------------------------------
     | Model Cache Enabled
     |--------------------------------------------------------------------------
-    | 
+    |
     | Determines if model caching is enabled. When disabled, all cache
     | operations will be bypassed and closures will execute normally.
     |
@@ -18,7 +18,7 @@ return [
     |--------------------------------------------------------------------------
     | Default TTL
     |--------------------------------------------------------------------------
-    | 
+    |
     | The default time-to-live for cached entries when no TTL is specified.
     | Can be an ExpireAfter enum value or integer seconds.
     |
