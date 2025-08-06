@@ -8,32 +8,32 @@ describe('Cache Store Compatibility', function () {
         Cache::flush();
     });
 
-    it('works with array cache store (non-taggable)', function () {
-        // Array cache store doesn't support tags
-        config(['cache.default' => 'array']);
+    it('works with file cache store (non-taggable)', function () {
+        // File cache store doesn't support tags
+        config(['cache.default' => 'file']);
         
         $callCount = 0;
         
         $closure = function () use (&$callCount) {
             $callCount++;
-            return 'array_cached_data';
+            return 'file_cached_data';
         };
         
         $result1 = User::remember($closure);
         
-        expect($result1)->toBe('array_cached_data');
+        expect($result1)->toBe('file_cached_data');
         expect($callCount)->toBe(1);
         
         // Should be cached
         $result2 = User::remember($closure);
         
-        expect($result2)->toBe('array_cached_data');
+        expect($result2)->toBe('file_cached_data');
         expect($callCount)->toBe(1);
     });
 
     it('flushes entire cache when using non-taggable store', function () {
-        // Array cache store doesn't support tags, so flushModelCache should flush all
-        config(['cache.default' => 'array']);
+        // File cache store doesn't support tags, so flushModelCache should flush all
+        config(['cache.default' => 'file']);
         
         $callCount = 0;
         
@@ -60,53 +60,53 @@ describe('Cache Store Compatibility', function () {
     });
 
     it('works with instance caching on non-taggable store', function () {
-        config(['cache.default' => 'array']);
+        config(['cache.default' => 'file']);
         
         $user = User::factory()->create();
         $callCount = 0;
         
         $closure = function () use (&$callCount) {
             $callCount++;
-            return 'instance_array_data';
+            return 'instance_file_data';
         };
         
         $result1 = $user->rememberOnSelf($closure);
         
-        expect($result1)->toBe('instance_array_data');
+        expect($result1)->toBe('instance_file_data');
         expect($callCount)->toBe(1);
         
         // Should be cached
         $result2 = $user->rememberOnSelf($closure);
         
-        expect($result2)->toBe('instance_array_data');
+        expect($result2)->toBe('instance_file_data');
         expect($callCount)->toBe(1);
     });
 
-    it('works correctly with array cache store', function () {
+    it('works correctly with file cache store', function () {
         // This tests that the package works with non-taggable stores
-        config(['cache.default' => 'array']);
+        config(['cache.default' => 'file']);
         
         $callCount = 0;
         
         $closure = function () use (&$callCount) {
             $callCount++;
-            return 'non_tagged_data';
+            return 'file_store_data';
         };
         
         $result = User::remember($closure);
         
-        expect($result)->toBe('non_tagged_data');
+        expect($result)->toBe('file_store_data');
         expect($callCount)->toBe(1);
         
         // Should still be cached
         $result2 = User::remember($closure);
         
-        expect($result2)->toBe('non_tagged_data');
+        expect($result2)->toBe('file_store_data');
         expect($callCount)->toBe(1);
     });
 
-    it('uses model cache prefix with non-taggable stores', function () {        
-        config(['cache.default' => 'array']);
+    it('uses model cache prefix with non-taggable stores', function () {
+        config(['cache.default' => 'file']);
         
         $user = User::factory()->create();
         $callCount = 0;

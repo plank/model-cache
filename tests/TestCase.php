@@ -16,8 +16,6 @@ class TestCase extends Orchestra
             fn (string $modelName) => 'Plank\\ModelCache\\Tests\\Helper\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
 
-        config(['model-cache.enabled' => true]);
-
         $this->artisan('migrate', [
             '--path' => __DIR__.'/Database/Migrations',
             '--realpath' => true,
@@ -29,5 +27,11 @@ class TestCase extends Orchestra
         return [
             ModelCacheServiceProvider::class,
         ];
+    }
+
+    protected function getEnvironmentSetUp($app)
+    {
+        $app['config']->set('cache.default', 'array');
+        $app['config']->set('model-cache.enabled', true);
     }
 }

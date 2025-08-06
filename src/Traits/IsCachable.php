@@ -21,7 +21,7 @@ trait IsCachable
      * @template TReturn
      * 
      * @param Closure():TReturn $callable
-     * @param callable():string|string $prefix
+     * @param callable():string|string|class-string $prefix
      * @return TReturn
      */
     public static function remember(
@@ -36,9 +36,11 @@ trait IsCachable
 
         $key = static::closureKey($callable);
 
-        $prefix = is_string($prefix)
-            ? $prefix
-            : $prefix();
+        $prefix = match (true) {
+            is_callable($prefix) => $prefix(),
+            is_string($prefix) && class_exists($prefix) && is_callable(new $prefix()) => (new $prefix())(),
+            default => $prefix,
+        };
 
         $key = $prefix
             ? ($prefix . ':' . $key)
@@ -70,7 +72,7 @@ trait IsCachable
      * @template TReturn
      * 
      * @param Closure():TReturn $callable
-     * @param callable():string|string $prefix
+     * @param callable():string|string|class-string $prefix
      * @return TReturn
      */
     public function rememberOnSelf(
@@ -85,9 +87,11 @@ trait IsCachable
 
         $key = static::closureKey($callable);
 
-        $prefix = is_string($prefix)
-            ? $prefix
-            : $prefix();
+        $prefix = match (true) {
+            is_callable($prefix) => $prefix(),
+            is_string($prefix) && class_exists($prefix) && is_callable(new $prefix()) => (new $prefix())(),
+            default => $prefix,
+        };
 
         $key = $prefix
             ? ($prefix . ':' . $key)

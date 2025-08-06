@@ -40,7 +40,6 @@ describe('Simple Model Cache Test', function () {
     });
 
     it('tests whether cache tags are the problem', function () {
-        config(['cache.default' => 'array']); // Use array store to bypass tags
         
         $callCount = 0;
         
