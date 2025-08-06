@@ -41,11 +41,11 @@ trait IsCachable
             : $prefix();
 
         $key = $prefix
-            ? ($prefix.':'.$key)
+            ? ($prefix . ':' . $key)
             : $key;
 
         $key = ($prefix = static::modelCachePrefix())
-            ? ($prefix.':'.$key)
+            ? ($prefix . ':' . $key)
             : $key;
 
         $ttl = $ttl instanceof ExpireAfter
@@ -78,7 +78,7 @@ trait IsCachable
         array $tags = [],
         callable|string $prefix = '',
         ExpireAfter|int|null $ttl = null,
-    ): mixed { 
+    ): mixed {
         if (static::modelCacheDisabled()) {
             return $callable();
         }
@@ -90,7 +90,7 @@ trait IsCachable
             : $prefix();
 
         $key = $prefix
-            ? ($prefix.':'.$key)
+            ? ($prefix . ':' . $key)
             : $key;
 
         $ttl ??= ExpireAfter::default();
@@ -100,7 +100,7 @@ trait IsCachable
             : $ttl;
 
         if (! static::cacheSupportsTags()) {
-            return Cache::remember(static::modelCachePrefix().':'.$key, $ttl, $callable);
+            return Cache::remember(static::modelCachePrefix() . ':' . $key, $ttl, $callable);
         }
 
         $tags = array_merge(
@@ -110,7 +110,7 @@ trait IsCachable
         );
 
         return Cache::tags($tags)
-            ->remember(static::modelCachePrefix().':'.$key, $ttl, $callable);
+            ->remember(static::modelCachePrefix() . ':' . $key, $ttl, $callable);
     }
 
     protected static function handleTag(string $tag)
@@ -123,7 +123,9 @@ trait IsCachable
             $tag = str($tag)->snake();
         }
 
-        return static::withCacheTagPrefix($tag);
+        return ($prefix = static::modelCachePrefix())
+            ? ($prefix . ':' . $tag)
+            : $tag;
     }
 
     public static function defaultTags(): array
@@ -136,10 +138,46 @@ trait IsCachable
         return ! config()->get('model-cache.enabled', false);
     }
 
-    protected static function closureKey(callable $closure) {
-        $reflection = new ReflectionFunction($closure);
-        $class = $reflection->getClosureScopeClass()->getName();
+    protected static function closureKey(callable $closure): string
+    {
+        return match (true) {
+            $closure instanceof Closure => static::handleClosureKey($closure),
+            is_array($closure) => static::handleArrayCallableKey($closure),
+            is_object($closure) => static::handleObjectCallableKey($closure),
+            is_string($closure) => static::handleStringCallableKey($closure),
+            default => throw new \Exception('Unknown Callable Type'),
+        };
+    }
 
-        return "{$class}{$reflection->getShortName()}:{$reflection->getStartLine()}";
+    private static function handleClosureKey(Closure $closure): string
+    {
+        $reflection = new ReflectionFunction($closure);
+
+        if ($scopeClass = $reflection->getClosureScopeClass()) {
+            return $scopeClass->getName() . '::' . $reflection->getShortName() . ':' . $reflection->getStartLine();
+        }
+
+        return 'global::' . $reflection->getShortName() . ':' . $reflection->getStartLine();
+    }
+
+    private static function handleArrayCallableKey(array $callable): string
+    {
+        [$classOrObject, $method] = $callable;
+
+        if (is_object($classOrObject)) {
+            return get_class($classOrObject) . '::' . $method . '_instance';
+        }
+
+        return (string) ($classOrObject . '::' . $method . '_static');
+    }
+
+    private static function handleObjectCallableKey(object $callable): string
+    {
+        return get_class($callable) . '::__invoke';
+    }
+
+    private static function handleStringCallableKey(string $callable): string
+    {
+        return 'function::' . $callable;
     }
 }
