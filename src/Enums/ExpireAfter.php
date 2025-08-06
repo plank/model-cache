@@ -10,7 +10,7 @@ enum ExpireAfter
     case TenMinutes;
     case FifteenMinutes;
     case ThirtyMinutes;
-    case FourtyFiveMinutes;
+    case FortyFiveMinutes;
     case OneHour;
     case OneDay;
     case OneWeek;
@@ -26,7 +26,7 @@ enum ExpireAfter
             self::TenMinutes => 600,
             self::FifteenMinutes => 900,
             self::ThirtyMinutes => 1800,
-            self::FourtyFiveMinutes => 2700,
+            self::FortyFiveMinutes => 2700,
             self::OneHour => 3600,
             self::OneDay => 86400,
             self::OneWeek => 604800,
