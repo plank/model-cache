@@ -26,7 +26,7 @@ describe('Cache Debugging', function () {
         
         // Use reflection to access protected method
         $reflection = new \ReflectionClass(User::class);
-        $method = $reflection->getMethod('closureKey');
+        $method = $reflection->getMethod('cachableKey');
         $method->setAccessible(true);
         
         $key = $method->invokeArgs(null, [$closure]);

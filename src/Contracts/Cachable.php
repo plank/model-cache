@@ -13,12 +13,12 @@ interface Cachable extends Flushable
      *
      * @template TReturn
      * 
-     * @param Closure():TReturn $callable
-     * @param callable():string|string|class-string $prefix
+     * @param callable():TReturn|class-string $callable
+     * @param callable():string|class-string|string $prefix
      * @return TReturn
      */
     public static function remember(
-        Closure $callable,
+        callable|string $callable,
         array $tags = [],
         callable|string $prefix = '',
         ExpireAfter|int|null $ttl = null,
@@ -31,12 +31,12 @@ interface Cachable extends Flushable
      *
      * @template TReturn
      * 
-     * @param Closure():TReturn $callable
+     * @param callable():TReturn|class-string $callable
      * @param callable():string|string|class-string $prefix
      * @return TReturn
      */
     public function rememberOnSelf(
-        Closure $callable,
+        callable|string $callable,
         array $tags = [],
         callable|string $prefix = '',
         ExpireAfter|int|null $ttl = null,

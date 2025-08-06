@@ -9,9 +9,9 @@ describe('Cache Key Debugging', function () {
     });
 
     it('demonstrates different closures create different cache keys', function () {
-        // Use reflection to access the protected closureKey method
+        // Use reflection to access the protected cachableKey method
         $reflection = new \ReflectionClass(User::class);
-        $method = $reflection->getMethod('closureKey');
+        $method = $reflection->getMethod('cachableKey');
         $method->setAccessible(true);
         
         // Two identical closures defined on different lines 
@@ -33,7 +33,7 @@ describe('Cache Key Debugging', function () {
 
     it('demonstrates same closure variable creates same cache key', function () {
         $reflection = new \ReflectionClass(User::class);
-        $method = $reflection->getMethod('closureKey');
+        $method = $reflection->getMethod('cachableKey');
         $method->setAccessible(true);
         
         // Same closure variable used twice

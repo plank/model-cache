@@ -14,7 +14,7 @@ describe('Simple Model Cache Test', function () {
         };
         
         $reflection = new \ReflectionClass(User::class);
-        $method = $reflection->getMethod('closureKey');
+        $method = $reflection->getMethod('cachableKey');
         $method->setAccessible(true);
         
         $key1 = $method->invokeArgs(null, [$closure]);
@@ -63,10 +63,10 @@ describe('Simple Model Cache Test', function () {
         
         // Access protected method
         $reflection = new \ReflectionClass(User::class);
-        $closureKeyMethod = $reflection->getMethod('closureKey');
-        $closureKeyMethod->setAccessible(true);
+        $cachableKeyMethod = $reflection->getMethod('cachableKey');
+        $cachableKeyMethod->setAccessible(true);
         
-        $key = $closureKeyMethod->invokeArgs(null, [$closure]);
+        $key = $cachableKeyMethod->invokeArgs(null, [$closure]);
         
         // Add model cache prefix manually
         $prefixedKey = User::modelCachePrefix() ? User::modelCachePrefix() . ':' . $key : $key;

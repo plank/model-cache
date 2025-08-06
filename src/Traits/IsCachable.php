@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Plank\ModelCache\Contracts\Cachable;
+use Plank\ModelCache\Contracts\Flushable;
 use Plank\ModelCache\Enums\ExpireAfter;
 use ReflectionFunction;
 
@@ -20,12 +21,12 @@ trait IsCachable
     /**
      * @template TReturn
      * 
-     * @param Closure():TReturn $callable
-     * @param callable():string|string|class-string $prefix
+     * @param callable():TReturn|class-string $callable
+     * @param callable():string|class-string|string $prefix
      * @return TReturn
      */
     public static function remember(
-        Closure $callable,
+        callable|string $callable,
         array $tags = [],
         callable|string $prefix = '',
         ExpireAfter|int|null $ttl = null,
@@ -34,7 +35,8 @@ trait IsCachable
             return $callable();
         }
 
-        $key = static::closureKey($callable);
+        $key = static::cachableKey($callable);
+        $closure = static::cachableClosure($callable);
 
         $prefix = match (true) {
             is_callable($prefix) => $prefix(),
@@ -55,7 +57,7 @@ trait IsCachable
             : $ttl;
 
         if (! static::cacheSupportsTags()) {
-            return Cache::remember($key, $ttl, $callable);
+            return Cache::remember($key, $ttl, $closure);
         }
 
         $tags = array_merge(
@@ -65,18 +67,18 @@ trait IsCachable
         );
 
         return Cache::tags($tags)
-            ->remember($key, $ttl, $callable);
+            ->remember($key, $ttl, $closure);
     }
 
     /**
      * @template TReturn
      * 
-     * @param Closure():TReturn $callable
+     * @param callable():TReturn|class-string $callable
      * @param callable():string|string|class-string $prefix
      * @return TReturn
      */
     public function rememberOnSelf(
-        Closure $callable,
+        callable|string $callable,
         array $tags = [],
         callable|string $prefix = '',
         ExpireAfter|int|null $ttl = null,
@@ -85,7 +87,8 @@ trait IsCachable
             return $callable();
         }
 
-        $key = static::closureKey($callable);
+        $key = static::cachableKey($callable);
+        $closure = static::cachableClosure($callable);
 
         $prefix = match (true) {
             is_callable($prefix) => $prefix(),
@@ -104,7 +107,7 @@ trait IsCachable
             : $ttl;
 
         if (! static::cacheSupportsTags()) {
-            return Cache::remember(static::modelCachePrefix() . ':' . $key, $ttl, $callable);
+            return Cache::remember(static::modelCachePrefix() . ':' . $key, $ttl, $closure);
         }
 
         $tags = array_merge(
@@ -114,17 +117,17 @@ trait IsCachable
         );
 
         return Cache::tags($tags)
-            ->remember(static::modelCachePrefix() . ':' . $key, $ttl, $callable);
+            ->remember(static::modelCachePrefix() . ':' . $key, $ttl, $closure);
     }
 
-    protected static function handleTag(string $tag)
+    protected static function handleTag(Flushable|string $tag)
     {
-        if (class_exists($tag)) {
-            if (is_a($tag, Cachable::class, true)) {
-                return $tag::modelCacheTag();
-            }
+        if ($tag instanceof Flushable) {
+            return $tag->instanceCacheTag();
+        }
 
-            $tag = str($tag)->snake();
+        if (class_exists($tag) && is_a($tag, Flushable::class, true)) {
+            return $tag::modelCacheTag();
         }
 
         return ($prefix = static::modelCachePrefix())
@@ -142,18 +145,45 @@ trait IsCachable
         return ! config()->get('model-cache.enabled', false);
     }
 
-    protected static function closureKey(callable $closure): string
+    /**
+     * @param Closure|callable|class-string
+     */
+    protected static function cachableClosure(callable|string $callable): Closure
+    {
+        if ($callable instanceof Closure) {
+            return $callable;
+        }
+
+        $isInvokeableClass = is_string($callable)
+            && class_exists($callable)
+            && is_callable(new $callable());
+
+        $callable = $isInvokeableClass
+            ? new $callable()
+            : $callable;
+
+        return function () use ($callable) {
+            return $callable();
+        };
+    }
+
+    protected static function cachableKey(callable|string $callable): string
     {
         return match (true) {
-            $closure instanceof Closure => static::handleClosureKey($closure),
-            is_array($closure) => static::handleArrayCallableKey($closure),
-            is_object($closure) => static::handleObjectCallableKey($closure),
-            is_string($closure) => static::handleStringCallableKey($closure),
+            $callable instanceof Closure => static::handleCachableKey($callable),
+            is_string($callable) => static::handleInvokeableKey($callable),
+            is_array($callable) => static::handleArrayCallableKey($callable),
+            is_object($callable) => static::handleObjectCallableKey($callable),
             default => throw new \Exception('Unknown Callable Type'),
         };
     }
 
-    private static function handleClosureKey(Closure $closure): string
+    private static function handleInvokableKey(string $class): string
+    {
+        return $class . '::__invoke';
+    }
+
+    private static function handleCachableKey(Closure $closure): string
     {
         $reflection = new ReflectionFunction($closure);
 
@@ -178,10 +208,5 @@ trait IsCachable
     private static function handleObjectCallableKey(object $callable): string
     {
         return get_class($callable) . '::__invoke';
-    }
-
-    private static function handleStringCallableKey(string $callable): string
-    {
-        return 'function::' . $callable;
     }
 }
