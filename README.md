@@ -77,7 +77,7 @@ class User extends Model implements Cachable
 
 The following example invalidates when:
 1. Any `User` model is created, updated, or deleted
-2. Any `Post` or `Comment` model is updated, due to their tags being added.
+2. Any `Post` or `Comment` model is created, updated, or deleted, due to their tags being added.
     - This means that `Post` and `Comment` would need to implement `Flushable` or `Cachable`
 
 ```php
